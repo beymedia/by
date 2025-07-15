@@ -1,5 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { mockWeatherService } from '../services/mockWeatherService';
+import axios from 'axios';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 
 const WeatherContext = createContext();
 
@@ -39,19 +42,28 @@ export const WeatherProvider = ({ children }) => {
     
     try {
       const [currentData, forecastData, hourlyData] = await Promise.all([
-        mockWeatherService.getCurrentWeather(city),
-        mockWeatherService.getForecast(city),
-        mockWeatherService.getHourlyForecast(city)
+        axios.get(`${API}/weather/current/${encodeURIComponent(city)}`),
+        axios.get(`${API}/weather/forecast/${encodeURIComponent(city)}`),
+        axios.get(`${API}/weather/hourly/${encodeURIComponent(city)}`)
       ]);
 
-      setCurrentWeather(currentData);
-      setForecast(forecastData);
-      setHourlyForecast(hourlyData);
+      setCurrentWeather(currentData.data);
+      setForecast(forecastData.data);
+      setHourlyForecast(hourlyData.data);
       setSelectedCity(city);
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.detail || 'Hava məlumatları alınmadı');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const searchCities = async (query) => {
+    try {
+      const response = await axios.get(`${API}/weather/search/${encodeURIComponent(query)}`);
+      return response.data.map(city => `${city.name}, ${city.country}`);
+    } catch (err) {
+      return [];
     }
   };
 
@@ -100,6 +112,7 @@ export const WeatherProvider = ({ children }) => {
     error,
     selectedCity,
     fetchWeatherData,
+    searchCities,
     addToFavorites,
     removeFromFavorites,
     getUserLocation
