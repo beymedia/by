@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from typing import List
-from ..services.weather_service import weather_service
-from ..models.weather_models import (
+from services.weather_service import weather_service
+from models.weather_models import (
     CurrentWeatherResponse,
     ForecastDayResponse,
     HourlyForecastResponse,
