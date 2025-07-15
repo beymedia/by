@@ -4,6 +4,12 @@ from typing import Dict, List, Optional
 from datetime import datetime, timedelta
 import asyncio
 import aiohttp
+from dotenv import load_dotenv
+from pathlib import Path
+
+# Load environment variables
+ROOT_DIR = Path(__file__).parent.parent
+load_dotenv(ROOT_DIR / '.env')
 
 class WeatherService:
     def __init__(self):
