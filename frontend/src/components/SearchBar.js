@@ -1,20 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useWeather } from '../contexts/WeatherContext';
-import { mockWeatherService } from '../services/mockWeatherService';
 import { Search, MapPin, Star } from 'lucide-react';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 
 const SearchBar = () => {
-  const { fetchWeatherData, selectedCity, addToFavorites, getUserLocation } = useWeather();
+  const { fetchWeatherData, selectedCity, addToFavorites, getUserLocation, searchCities } = useWeather();
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   useEffect(() => {
-    const searchCities = async () => {
+    const searchCitiesHandler = async () => {
       if (query.length > 1) {
-        const cities = await mockWeatherService.searchCities(query);
+        const cities = await searchCities(query);
         setSuggestions(cities);
         setShowSuggestions(true);
       } else {
@@ -23,14 +22,16 @@ const SearchBar = () => {
       }
     };
 
-    const debounce = setTimeout(searchCities, 300);
+    const debounce = setTimeout(searchCitiesHandler, 300);
     return () => clearTimeout(debounce);
-  }, [query]);
+  }, [query, searchCities]);
 
   const handleCitySelect = (city) => {
     setQuery('');
     setShowSuggestions(false);
-    fetchWeatherData(city);
+    // Extract city name from "City, Country" format
+    const cityName = city.split(',')[0].trim();
+    fetchWeatherData(cityName);
   };
 
   const handleCurrentLocation = async () => {
