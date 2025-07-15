@@ -8,6 +8,8 @@ import aiohttp
 class WeatherService:
     def __init__(self):
         self.api_key = os.environ.get('OPENWEATHER_API_KEY')
+        if not self.api_key:
+            raise ValueError("OPENWEATHER_API_KEY not found in environment variables")
         self.base_url = "https://api.openweathermap.org/data/2.5"
         self.geo_url = "https://api.openweathermap.org/geo/1.0"
         
